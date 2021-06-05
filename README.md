@@ -3,35 +3,32 @@
 #### 介绍
 常见的excel操作的方法封装，如解析合并单元格、解析excel中的图片等方法，都会写到此项目中，避免百度找来找去浪费时间精力。
 
-#### 软件架构
-软件架构说明
+#### 目录说明
+- 使用poi请在com.pangchun.poi目录下找。easy-excel的在com.pangchun.easyexcel目录下找。
+- 两种excel工具都提供read、write的相关方法，请在对应目录下找。
+- com.pangchun.poi / easyexcel.support目录下是一些支持类，如自定义异常、自定义注解等。
+- 因为只是封装一些方法，因此没有连服务器，上传文件，excel模板都是本地模拟，使用resource目录下的static文件夹。
+- 其他说明，根据文件夹命名很容易理解，此处不再作说明。
 
 
 #### 安装教程
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+- 导入相关maven或jar包，maven请参考pom.xml文件。
+- 导入依赖后直接复制粘贴代码到自己项目中即可使用。
 
 #### 使用说明
 
-1.  xxxx
-2.  xxxx
-3.  xxxx
+- 暂无，后续编写。
 
 #### 参与贡献
 
-1.  Fork 本仓库
-2.  新建 Feat_xxx 分支
-3.  提交代码
-4.  新建 Pull Request
+- Fork 本仓库
+- 新建 Feat_xxx 分支
+- 提交代码
+- 新建 Pull Request
 
 
-#### 特技
+#### 其它
 
-1.  使用 Readme\_XXX.md 来支持不同的语言，例如 Readme\_en.md, Readme\_zh.md
-2.  Gitee 官方博客 [blog.gitee.com](https://blog.gitee.com)
-3.  你可以 [https://gitee.com/explore](https://gitee.com/explore) 这个地址来了解 Gitee 上的优秀开源项目
-4.  [GVP](https://gitee.com/gvp) 全称是 Gitee 最有价值开源项目，是综合评定出的优秀开源项目
-5.  Gitee 官方提供的使用手册 [https://gitee.com/help](https://gitee.com/help)
-6.  Gitee 封面人物是一档用来展示 Gitee 会员风采的栏目 [https://gitee.com/gitee-stars/](https://gitee.com/gitee-stars/)
+- 暂无。
+
