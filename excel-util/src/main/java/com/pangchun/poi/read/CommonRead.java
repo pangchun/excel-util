@@ -34,10 +34,12 @@ public class CommonRead<T> {
      */
     public Workbook getWorkbook(File file) throws IOException {
         Workbook workbook = null;
+        String suffix03 = ".xls";
+        String suffix07 = ".xlsx";
         String fileName = file.getName();
-        if (fileName.endsWith(".xls")) {
+        if (fileName.endsWith(suffix03)) {
             workbook = new HSSFWorkbook(new FileInputStream(file));
-        } else if (fileName.endsWith(".xlsx")) {
+        } else if (fileName.endsWith(suffix07)) {
             workbook = new XSSFWorkbook(new FileInputStream(file));
         }
         if (workbook != null) { workbook.close();}
@@ -76,7 +78,7 @@ public class CommonRead<T> {
                 if (cell != null) {
                     String cellValue = cell.getStringCellValue();
                     // replace(" ", "").equals("")在jdk11以上可以使用isBlank()替换
-                    if (cellValue != null && !cellValue.replace(" ", "").equals("")) {
+                    if (cellValue != null && !"".equals(cellValue.replace(" ", ""))) {
                         dataMap.put(colNo, cellValue);
                     }
                 }
@@ -156,9 +158,18 @@ public class CommonRead<T> {
                         Date date = cell.getDateCellValue();
                         cellValue = new DateTime(date).toString("yyyy-MM-dd HH:mm:ss");
                     } else {
-                        // 防止数字过长,转为String
-                        DecimalFormat format = new DecimalFormat("0");
-                        cellValue = format.format(cell.getNumericCellValue());
+                        // 防止数字过长，转为String，保留两位小数，若小数为零则直接取整数
+                        DecimalFormat format = null;
+                        double value = cell.getNumericCellValue();
+                        format = new DecimalFormat("0.00");
+                        String valueString = format.format(value);
+                        String replace = valueString.substring(valueString.lastIndexOf(".") + 1).replace("0", "");
+                        if ("".equals(replace)) {
+                            format = new DecimalFormat("0");
+                            cellValue = format.format(value);
+                        } else {
+                            cellValue = valueString;
+                        }
                     }
                     break;
                 // 空白单元格类型
@@ -381,34 +392,32 @@ public class CommonRead<T> {
         ImageBean imageBean = new ImageBean();
         // 先默认此图片不在任何一个单元格内
         boolean matchNoCell = true;
-        if (firstRowIndex == lastRowIndex && firstColIndex == lastColIndex){
-            // 非合并单元格
-            matchNoCell = false;
-        } else {
-            // 合并单元格, 图片的边界值取其所在合并单元格的边界值
-            List<CellRangeAddress> mergedRegions = sheet.getMergedRegions();
-            for (CellRangeAddress mergedRegion : mergedRegions) {
-                int firstRow = mergedRegion.getFirstRow();
-                int lastRow = mergedRegion.getLastRow();
-                int firstColumn = mergedRegion.getFirstColumn();
-                int lastColumn = mergedRegion.getLastColumn();
-                if (firstRowIndex >= firstRow
-                        && firstColIndex >= firstColumn
-                        && lastRowIndex <= lastRow
-                        && lastColIndex <= lastColumn) {
-                    // 图片所在单元格在此合并单元格内
-                    firstRowIndex = firstRow;
-                    lastRowIndex = lastRow;
-                    firstColIndex = firstColumn;
-                    lastColIndex = lastColumn;
-                    matchNoCell = false;
-                    break;
-                }
+        // 判断图片是否在合并单元格内，若在合并单元格内, 图片的边界值取其所在合并单元格的边界值
+        List<CellRangeAddress> mergedRegions = sheet.getMergedRegions();
+        for (CellRangeAddress mergedRegion : mergedRegions) {
+            int firstRow = mergedRegion.getFirstRow();
+            int lastRow = mergedRegion.getLastRow();
+            int firstColumn = mergedRegion.getFirstColumn();
+            int lastColumn = mergedRegion.getLastColumn();
+            if (firstRowIndex >= firstRow
+                    && firstColIndex >= firstColumn
+                    && lastRowIndex <= lastRow
+                    && lastColIndex <= lastColumn) {
+                // 图片所在单元格在此合并单元格内
+                firstRowIndex = firstRow;
+                lastRowIndex = lastRow;
+                firstColIndex = firstColumn;
+                lastColIndex = lastColumn;
+                matchNoCell = false;
+                break;
             }
         }
+        // 不在合并单元格中，判断是否在非合并单元格内
         if (matchNoCell) {
-            // TODO 图片解析中如果抛出异常，已经上传的图片无法回滚，只能去手动删除，因此需要提供一个删除接口
-            throw new ExcelReadException("图片的插入位置有误，图片应位于所在单元格的边界线内，不应跨越两个单元格。");
+            if (!(firstRowIndex == lastRowIndex && firstColIndex == lastColIndex)){
+                // TODO 图片解析中如果抛出异常，已经上传的图片无法回滚，只能去手动删除，因此需要提供一个删除接口
+                throw new ExcelReadException("图片的插入位置有误，图片应位于所在单元格的边界线内，不应跨越两个单元格。");
+            }
         }
         imageBean.setFirstRow(firstRowIndex).setLastRow(lastRowIndex).setFirstCol(firstColIndex).setLastCol(lastColIndex).setUrl(url);
         return imageBean;
