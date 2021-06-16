@@ -27,7 +27,7 @@
 
 - 示例请查阅`package com.pangchun.poi.read.test包下测试类TestRead`。
 
-  >- 此示例是将`resources/static/template/person-template.xlsx`此文件解析成Employee对象，图片上传至`resourcesstatic/image`下。
+  >- 此示例是将`resources/static/template/person-template.xlsx`此文件解析成Employee对象，图片上传至`resources/static/image`下。
   >
   >- excel示例如图：
   >
